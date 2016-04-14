@@ -99,8 +99,10 @@ private:
     uint32_t mFifoMaxEventCount;
     String8 mStringType;
     String8 mRequiredPermission;
+#ifndef TS_MOD_MI4C
     bool mRequiredPermissionRuntime = false;
     int32_t mRequiredAppOp;
+#endif
     int32_t mMaxDelay;
     uint32_t mFlags;
     static void flattenString8(void*& buffer, size_t& size, const String8& string8);

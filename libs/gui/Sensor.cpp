@@ -120,8 +120,10 @@ Sensor::Sensor(struct sensor_t const* hwSensor, int halVersion)
         mStringType = SENSOR_STRING_TYPE_HEART_RATE;
 #ifndef NO_SENSOR_PERMISSION_CHECK
         mRequiredPermission = SENSOR_PERMISSION_BODY_SENSORS;
+#ifndef TS_MOD_MI4C
         AppOpsManager appOps;
         mRequiredAppOp = appOps.permissionToOpCode(String16(SENSOR_PERMISSION_BODY_SENSORS));
+#endif
 #endif
         mFlags |= SENSOR_FLAG_ON_CHANGE_MODE;
         } break;
@@ -226,10 +228,12 @@ Sensor::Sensor(struct sensor_t const* hwSensor, int halVersion)
 #ifndef NO_SENSOR_PERMISSION_CHECK
         if (halVersion > SENSORS_DEVICE_API_VERSION_1_0 && hwSensor->requiredPermission) {
             mRequiredPermission = hwSensor->requiredPermission;
+#ifndef TS_MOD_MI4C
             if (!strcmp(mRequiredPermission, SENSOR_PERMISSION_BODY_SENSORS)) {
                 AppOpsManager appOps;
                 mRequiredAppOp = appOps.permissionToOpCode(String16(SENSOR_PERMISSION_BODY_SENSORS));
             }
+#endif
         }
 #endif
 
@@ -350,11 +354,19 @@ const String8& Sensor::getRequiredPermission() const {
 }
 
 bool Sensor::isRequiredPermissionRuntime() const {
+#ifndef TS_MOD_MI4C
     return mRequiredPermissionRuntime;
+#else
+    return false;
+#endif
 }
 
 int32_t Sensor::getRequiredAppOp() const {
+#ifndef TS_MOD_MI4C
     return mRequiredAppOp;
+#else
+    return -1;
+#endif
 }
 
 int32_t Sensor::getMaxDelay() const {
@@ -378,9 +390,12 @@ size_t Sensor::getFlattenedSize() const
     size_t fixedSize =
             sizeof(int32_t) * 3 +
             sizeof(float) * 4 +
+#ifndef TS_MOD_MI4C
             sizeof(int32_t) * 6 +
             sizeof(bool);
-
+#else
+	    sizeof(int32_t) * 5;
+#endif
     size_t variableSize =
             sizeof(uint32_t) + FlattenableUtils::align<4>(mName.length()) +
             sizeof(uint32_t) + FlattenableUtils::align<4>(mVendor.length()) +
@@ -409,8 +424,10 @@ status_t Sensor::flatten(void* buffer, size_t size) const {
     FlattenableUtils::write(buffer, size, mFifoMaxEventCount);
     flattenString8(buffer, size, mStringType);
     flattenString8(buffer, size, mRequiredPermission);
+#ifndef TS_MOD_MI4C
     FlattenableUtils::write(buffer, size, mRequiredPermissionRuntime);
     FlattenableUtils::write(buffer, size, mRequiredAppOp);
+#endif
     FlattenableUtils::write(buffer, size, mMaxDelay);
     FlattenableUtils::write(buffer, size, mFlags);
     return NO_ERROR;
@@ -449,8 +466,10 @@ status_t Sensor::unflatten(void const* buffer, size_t size) {
     if (!unflattenString8(buffer, size, mRequiredPermission)) {
         return NO_MEMORY;
     }
+#ifndef TS_MOD_MI4C
     FlattenableUtils::read(buffer, size, mRequiredPermissionRuntime);
     FlattenableUtils::read(buffer, size, mRequiredAppOp);
+#endif
     FlattenableUtils::read(buffer, size, mMaxDelay);
     FlattenableUtils::read(buffer, size, mFlags);
     return NO_ERROR;
