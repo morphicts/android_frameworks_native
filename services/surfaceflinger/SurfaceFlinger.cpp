@@ -144,8 +144,7 @@ SurfaceFlinger::SurfaceFlinger()
         mAnimCompositionPending(false),
         mDebugRegion(0),
         mDebugDDMS(0),
-        //mDebugDisableHWC(0),
-        mDebugDisableHWC(1), // TS: Fix camera flicker
+        mDebugDisableHWC(0),
         mDebugDisableTransformHint(0),
         mDebugInSwapBuffers(0),
         mLastSwapBufferTime(0),
